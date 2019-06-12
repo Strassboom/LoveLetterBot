@@ -1,6 +1,14 @@
+import random
+
 class CardDeck:
     def __init__(self):
-        self.cards = [
+        self.cards = [0,1,1,1,1,1,2,2,3,3,4,4,5,5,6,7,8,9]
+        random.shuffle(self.cards)
+        self.graveyard = []
+
+class CardBot:
+    def __init__(self):
+        self.cardGraph = [
             [0],
             [0,0,0,0,0],
             [0,0],
