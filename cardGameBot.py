@@ -7,7 +7,7 @@ class CardDeck:
         self.graveyard = []
 
 class CardBot:
-    def __init__(self):
+    def __init__(self,cardDeck):
         self.cardGraph = [
             [0],
             [0,0,0,0,0],
@@ -20,6 +20,7 @@ class CardBot:
             [0],
             [0]
         ]
+        self.cardDeck = cardDeck
         self.cardActs = [self.mercenary,self.guard,self.priest,self.baron,self.handmaid,self.prince,self.king,self.countess,self.princess,self.emperor]
         self.handCard = None
         self.drawnCard = None
