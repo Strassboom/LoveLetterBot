@@ -2,9 +2,13 @@ import copy
 import random
 
 class CardDeck:
-    def __init__(self):
+    def __init__(self,debug=False):
         self.baseCards = [0,1,1,1,1,1,2,2,3,3,4,4,5,5,6,7,8,9]
-        self.newRound()
+        self.graveyard = []
+        if debug:
+            self.cards = copy.deepcopy(self.baseCards)
+        else:
+            self.newRound()
 
     '''Resets attributes for new round'''
     def newRound(self):
@@ -13,10 +17,11 @@ class CardDeck:
         self.graveyard = []
 
 class Player:
-    def __init__(self):
+    def __init__(self,nickName):
         self.cardActs = [self.mercenary,self.guard,self.priest,self.baron,self.handmaid,self.prince,self.king,self.countess,self.princess,self.emperor]
         self.points = 0
         self.playerList = []
+        self.nickName = nickName
         self.newRound()
 
     '''Resets attributes for new round'''
@@ -25,6 +30,7 @@ class Player:
         self.drawnCard = None
         self.inRound = True
         self.isSafe = False
+        self.cardList = []
         self.graveyard = []
 
     '''Opponent is out if current card is a mercenary'''
@@ -38,7 +44,8 @@ class Player:
         pass
 
     '''Get opponent's card'''
-    def priest(self):
+    def priest(self,player):
+        print("HandCard of ",player.nickName,": ",player.cardList[0])
         pass
 
     '''Compare hands with opponent, lowest hand is out'''
@@ -71,14 +78,53 @@ class Player:
 
     '''Draw a card'''
     def draw(self, card):
+        self.cardList.append(card)
         if self.handCard == None:
             self.handCard = card
         else:
             self.drawnCard = card
 
     '''See placed card'''
-    def place(self, card):
-        self.cardActs[card]()
+    def place(self):
+        if 9 in self.cardList:
+            if [x for x in self.c ardList if x != 9][0] >= 3:
+                choice = int(input("pick one: "+str([x for x in self.cardList])+": "))
+                while choice != 9:
+                    choice = int(input("Jk, you can only pick " + str(9) + ": "))
+                self.graveyard.append(9)
+                self.cardList.remove(9)
+                return
+
+        if 7 in self.cardList:
+            if [x for x in self.cardList if x != 7][0] in [5,6]:
+                choice = int(input("pick one: "+str([x for x in self.cardList])+": "))
+                while choice != 7:
+                    choice = int(input("Jk, you can only pick " + str(7) + ": "))
+                self.graveyard.append(7)
+                self.cardList.remove(7)
+                return
+
+        choice = int(input("pick one: "+str([x for x in self.cardList])+": "))
+        while choice not in self.cardList:
+            choice = int(input("pick one: "+str([x for x in self.cardList])+": "))
+        if choice == 2:
+            vulnerableList = [x.nickName for x in self.playerList if x.nickName != self.nickName and x.isSafe is False and x.inRound is True]
+            if len(vulnerableList) == 0:
+                vulnerableList = [self.nickName]
+            enemy = input("Pick an opponent: "+str(vulnerableList)+": ")
+            while enemy not in vulnerableList:
+                enemy = input("Pick an actual opponent: "+str(vulnerableList)+": ")
+            self.cardActs[choice]([x for x in self.playerList if x.nickName == enemy][0])
+            self.graveyard.append(2)
+            self.cardList.remove(2)
+        if choice == 8:
+            self.graveyard.append(8)
+            self.cardList.remove(8)
+            self.inRound = False
+        if choice == 0:
+            self.graveyard.append(0)
+            self.cardList.remove(0)
+        
         pass
 
 class CardBot:
@@ -86,6 +132,7 @@ class CardBot:
         self.cardActs = [self.mercenary,self.guard,self.priest,self.baron,self.handmaid,self.prince,self.king,self.countess,self.princess,self.emperor]
         self.points = 0
         self.playerList = []
+        self.nickName = "Botty"
         self.newRound()
 
     '''Resets attributes for new round'''
@@ -104,6 +151,7 @@ class CardBot:
         ]
         self.handCard = None
         self.drawnCard = None
+        self.cardList = []
         self.inRound = True
         self.isSafe = False
         self.graveyard = []
@@ -150,6 +198,7 @@ class CardBot:
 
     '''Draw a card'''
     def draw(self, card):
+        self.cardList.append(card)
         if self.handCard == None:
             self.handCard = card
         else:
@@ -159,4 +208,7 @@ class CardBot:
     '''See placed card'''
     def place(self, card):
         self.cardActs[card]()
+        if card == self.handCard:
+            self.handCard = self.drawnCard
+        self.drawnCard = None
         pass
