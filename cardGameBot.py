@@ -38,9 +38,17 @@ class Player:
         pass
     
     '''Opponent is out if their card is guessed correctly'''
-    def guard(self,card):
-        if card == 0:
-            print("out")
+    def guard(self,enemy,guess):
+        if enemy.cardList[0] == 0:
+            print("Guesser is out")
+            self.inRound = False
+            self.graveyard.append(self.cardList[0])
+            self.cardList.remove(self.cardList[0])
+        if enemy.cardList[0] == guess:
+            print("target is out")
+            enemy.inRound = False
+            enemy.graveyard.append(enemy.cardList[0])
+            enemy.cardList.remove(enemy.cardList[0])
         pass
 
     '''Get opponent's card'''
@@ -86,13 +94,15 @@ class Player:
 
     '''See placed card'''
     def place(self):
+        if self.isSafe:
+            self.isSafe = False
         if 9 in self.cardList:
-            if [x for x in self.c ardList if x != 9][0] >= 3:
+            if [x for x in self.cardList if x != 9][0] >= 3:
                 choice = int(input("pick one: "+str([x for x in self.cardList])+": "))
                 while choice != 9:
                     choice = int(input("Jk, you can only pick " + str(9) + ": "))
-                self.graveyard.append(9)
-                self.cardList.remove(9)
+                self.graveyard.append(choice)
+                self.cardList.remove(choice)
                 return
 
         if 7 in self.cardList:
@@ -100,14 +110,16 @@ class Player:
                 choice = int(input("pick one: "+str([x for x in self.cardList])+": "))
                 while choice != 7:
                     choice = int(input("Jk, you can only pick " + str(7) + ": "))
-                self.graveyard.append(7)
-                self.cardList.remove(7)
+                self.graveyard.append(choice)
+                self.cardList.remove(choice)
                 return
 
         choice = int(input("pick one: "+str([x for x in self.cardList])+": "))
         while choice not in self.cardList:
             choice = int(input("pick one: "+str([x for x in self.cardList])+": "))
         if choice == 2:
+            self.graveyard.append(choice)
+            self.cardList.remove(choice)
             vulnerableList = [x.nickName for x in self.playerList if x.nickName != self.nickName and x.isSafe is False and x.inRound is True]
             if len(vulnerableList) == 0:
                 vulnerableList = [self.nickName]
@@ -115,8 +127,6 @@ class Player:
             while enemy not in vulnerableList:
                 enemy = input("Pick an actual opponent: "+str(vulnerableList)+": ")
             self.cardActs[choice]([x for x in self.playerList if x.nickName == enemy][0])
-            self.graveyard.append(2)
-            self.cardList.remove(2)
         if choice == 8:
             self.graveyard.append(8)
             self.cardList.remove(8)
@@ -124,7 +134,22 @@ class Player:
         if choice == 0:
             self.graveyard.append(0)
             self.cardList.remove(0)
-        
+        if choice == 1:
+            vulnerableList = [x.nickName for x in self.playerList if x.nickName != self.nickName and x.isSafe is False and x.inRound is True]
+            if len(vulnerableList) > 0:
+                enemy = input("Pick an opponent: "+str(vulnerableList)+": ")
+                while enemy not in vulnerableList:
+                    enemy = input("Pick an actual opponent: "+str(vulnerableList)+": ")
+                guess = int(input("Pick a number card: "))
+                while not (0 <= guess <= 9):
+                    guess = int(input("Pick a number card 0 thru 9: "))
+                self.cardActs[choice]([x for x in self.playerList if x.nickName == enemy][0],guess)
+            self.graveyard.append(choice)
+            self.cardList.remove(choice)
+        if choice == 4:
+            self.graveyard.append(choice)
+            self.cardList.remove(choice)
+            self.isSafe = True
         pass
 
 class CardBot:
