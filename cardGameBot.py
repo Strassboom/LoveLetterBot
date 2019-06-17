@@ -179,8 +179,8 @@ class Player:
                         choice = int(input("pick one: "+str([x for x in self.cardList])+": "))
                     if choice in [1,2,3,5,6]:
                         if len(vulnerableList) == 1 and vulnerableList[0].nickName == self.nickName:
-                            decision = input("Are you sure you want to use this on yourself?: ")
-                            if decision == "y":
+                            decision = input("Are you sure you want to use this on yourself? (y/n): ")
+                            if "y" in decision:
                                 self.graveyard.append(choice)
                                 self.cardList.remove(choice)
                                 for count,player in enumerate(vulnerableList):
@@ -302,16 +302,8 @@ class CardBot(Player):
     '''Draw a card'''
     def draw(self, card):
         self.cardList.append(card)
-        if self.handCard == None:
-            self.handCard = card
-        else:
-            self.drawnCard = card
         pass
 
     '''See placed card'''
     def place(self, card):
-        self.cardActs[card]()
-        if card == self.handCard:
-            self.handCard = self.drawnCard
-        self.drawnCard = None
         pass
