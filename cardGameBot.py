@@ -29,8 +29,6 @@ class Player:
 
     '''Resets attributes for new round'''
     def newRound(self):
-        self.handCard = None
-        self.drawnCard = None
         self.inRound = True
         self.isSafe = False
         self.cardList = []
@@ -246,11 +244,9 @@ class CardBot:
             [0],
             [0]
         ]
-        self.handCard = None
-        self.drawnCard = None
-        self.cardList = []
         self.inRound = True
         self.isSafe = False
+        self.cardList = []
         self.graveyard = []
 
     '''Opponent is out if current card is a mercenary'''
