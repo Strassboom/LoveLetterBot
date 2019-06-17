@@ -39,23 +39,26 @@ class Player:
         pass
     
     '''Opponent is out if their card is guessed correctly'''
-    def guard(self,enemy):
+    def guard(self,player):
         while True:
             try:
-                guess = int(input("Make a guess: "))
-                while guess not in range(len(self.cardActs)-1):
+                if self != player:
                     guess = int(input("Make a guess: "))
-                if enemy.cardList[0] == guess:
-                    print("target is out")
-                    enemy.inRound = False
-                    enemy.graveyard.append(enemy.cardList[0])
-                    enemy.cardList.remove(enemy.cardList[0])
-                if enemy.cardList[0] == 0:
-                    print("Guesser is out")
-                    self.inRound = False
-                    self.graveyard.append(self.cardList[0])
-                    self.cardList.remove(self.cardList[0])
-                break
+                    while guess not in range(len(self.cardActs)):
+                        guess = int(input("Make a guess: "))
+                    if player.cardList[0] == 0:
+                        print(self.nickName," is out")
+                        self.inRound = False
+                        self.graveyard.append(self.cardList[0])
+                        self.cardList.remove(self.cardList[0])
+                    if player.cardList[0] == guess:
+                        print(player.nickName,"is out")
+                        player.inRound = False
+                        player.graveyard.append(player.cardList[0])
+                        player.cardList.remove(player.cardList[0])
+                    break
+                else:
+                    break
             except ValueError:
                 print("guess must be an integer")
                 continue
@@ -71,9 +74,11 @@ class Player:
     def baron(self,player):
         if self.cardList[0] > player.cardList[0]:
             player.inRound = False
+            print(self.cardList[0],"is greater than",player.cardList[0])
             print(player.nickName,"is out")
         elif self.cardList[0] < player.cardList[0]:
             self.inRound = False
+            print(player.cardList[0],"is greater than",self.cardList[0])
             print(self.nickName,"is out")
         else:
             print("A tie! Nothing Happens!")
@@ -82,6 +87,7 @@ class Player:
     '''Protects player from all effects until their next turn'''
     def handmaid(self):
         self.isSafe = True
+        print(self.nickName,"is safe until their next turn")
         pass
 
     '''Opponent discards their hand and redraws'''
@@ -89,6 +95,8 @@ class Player:
         card = player.cardList[0]
         player.graveyard.append(card)
         player.cardList.remove(card)
+        if self != player:
+            print(player.nickName,"discarded a",card)
         if card == 8:
             player.inRound = False
         else:
@@ -176,13 +184,15 @@ class Player:
                                 self.graveyard.append(choice)
                                 self.cardList.remove(choice)
                                 for count,player in enumerate(vulnerableList):
-                                    print(count,"->",player)
+                                    print(count,"->",player.nickName)
+                            else:
+                                continue
 
                             while True:
                                 try:
-                                    player = int(input("Pick an opponent: "+str(vulnerableList)+": "))
+                                    player = int(input("Pick an opponent: "))
                                     while player not in range(len(vulnerableList)):
-                                        player = input("Pick an actual opponent: "+str(vulnerableList)+": ")
+                                        player = input("Pick an actual opponent: ")
                                     self.cardActs[choice](vulnerableList[player])
                                     turnEnd = True
                                     print(self.nickName,"Discarded a",choice)
@@ -222,12 +232,12 @@ class Player:
                     continue
         pass
 
-class CardBot:
-    def __init__(self):
+class CardBot(Player):
+    def __init__(self,nickName="Botty"):
+        super.__init__(self,nickName)
         self.cardActs = [self.mercenary,self.guard,self.priest,self.baron,self.handmaid,self.prince,self.king,self.countess,self.princess,self.emperor]
         self.points = 0
         self.playerList = []
-        self.nickName = "Botty"
         self.newRound()
 
     '''Resets attributes for new round'''
